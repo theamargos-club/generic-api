@@ -1,9 +1,7 @@
-const http = require('http')
 const express = require('express')
 const cors = require('cors')
 const { MongoClient } = require('mongodb')
 const session = require('express-session')
-const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const expressJwt = require('express-jwt')
 const bodyParser = require('body-parser')
@@ -11,33 +9,26 @@ const settings = require('./config')
 const auth = require('./auth');
 const errors = require('./errors');
 const { gLst, gGet, gPut, gDel, gUpd } = require('./api')
-const mail = require('./mail')
 
 const app = express();
 const config = settings.init(app);
 const secret = "4$4bmQH23+$IFTRMv34R5seffeceE0EmC8YQ4o$";
 
 app.use(cors());
-app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(session({ secret: secret, resave: true, saveUninitialized: true}));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use('/api/', expressJwt({secret: secret}));
-app.use(require('express-validator')());
 
 
 MongoClient.connect(config.APP.DB_URL, (
-  (err, db) => {
+  (err, conn) => {
     if(err){
       console.log('Unable to connect to mongodb', err)
       return;
     }
+    const db = conn.db("test")
 
-    //mail.init(config);
-
-    app.post('/signup', auth.signup(db, mail));
-    app.get ('/confirm/:token', auth.confirm(db));
     app.post('/login', auth.login(db, secret, jwt));
 
     // generic api
@@ -46,14 +37,12 @@ MongoClient.connect(config.APP.DB_URL, (
     app.get ('/api/:entity/del', gDel(db));
     app.post('/api/:entity/put', gPut(db));
     app.post('/api/:entity/upd', gUpd(db));
-    app.get('/mp/get', mpGet(mp));
-    app.get('/mp/qr', mpQr(mp));
 
     app.all('*', function(req, res){
       res.status(404).json(errors.type.NOT_FOUND);
     });
 
-    http.createServer(app).listen(config.APP.PORT, function() {
+    app.listen(config.APP.PORT, () => {
       console.log(config.APP.DB_URL);
       console.log("\n[*] Server Listening on port %d", config.APP.PORT);
     });
@@ -63,7 +52,7 @@ MongoClient.connect(config.APP.DB_URL, (
 // Global error handler
 app.use((err, req, res, next) => {
   if (!('error' in err)) {
-    console.log(err.stack); // Log stack error in console
+    console.log(`Error stack: ${err.stack}`); // Log stack error in console
     res.status(500).send(errors.type.SERVER_ERROR);
     return;
   }
