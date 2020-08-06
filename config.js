@@ -12,6 +12,7 @@ const config = {
     },
     APP: {
       DB_URL: `mongodb://localhost:27017/${db}`,
+      DB: db,
       CONFIRM_ACCOUNT_LINK: domain + '/confirm/email',
       PORT: port,
       TMP_DIR: 'tmp/',
@@ -79,6 +80,6 @@ const config = {
 
 exports.init = (app) => {
   const mode = app.get('env');
-  console.log(mode);
+  console.log(`[*] MODE: ${mode}`);
   return config[mode];
 }

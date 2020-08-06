@@ -1,4 +1,4 @@
-exports.type = {
+const errors = {
   "BAD_REQUEST": {
     "error": {
       "code": 400,
@@ -52,3 +52,10 @@ exports.type = {
   }
 };
 
+const res_error = (res, type, message) => {
+  const { error } = errors[type]
+  if (message) error.message = message
+  return res.status(error.code).json(error)
+}
+
+module.exports = { errors, res_error }
