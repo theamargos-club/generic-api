@@ -17,8 +17,8 @@ exports.login = (db, secret, jwt) => (req, res) => {
       }
     )
   } else {
-    return res_error('SERVER_ERROR')
+    return res_error(res, 'SERVER_ERROR')
   }
 }
 
-exports.logged  = (req, res, next) => req.isAuthenticated() ? next(): res_error('INVALID_CREDENTIALS')
+exports.logged  = (req, res, next) => req.isAuthenticated() ? next(): res_error(res, 'INVALID_CREDENTIALS')

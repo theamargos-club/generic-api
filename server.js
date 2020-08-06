@@ -37,7 +37,7 @@ MongoClient.connect(config.APP.DB_URL, {useUnifiedTopology: true}, (
     app.post('/api/:entity/put', gPut(db));
     app.post('/api/:entity/upd', gUpd(db));
 
-    app.all('*', (req, res) => res_ERROR('NOT_FOUND'));
+    app.all('*', (req, res) => res_error(res, 'NOT_FOUND'));
 
     app.listen(config.APP.PORT, () => {
       console.log(`[*] Database URL ${config.APP.DB_URL}`);
