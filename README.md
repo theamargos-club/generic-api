@@ -9,7 +9,7 @@ TODO
 ====
 - [X] Review old Code
 - [X] Fix error handler
-- [ ] Update to new version of libraries
+- [X] Update to new version of libraries
 - [ ] Re implement Register with token confirmation
 - [ ] ACLs for entities
 - [ ] Gateways for anothers apis (something generic)

@@ -18,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(session({ secret: secret, resave: true, saveUninitialized: true}));
-app.use('/api/', expressJwt({secret: secret}));
+app.use('/api/', expressJwt({secret: secret, algorithms: ['HS256']}));
 
 
 MongoClient.connect(config.APP.DB_URL, {useUnifiedTopology: true}, (
