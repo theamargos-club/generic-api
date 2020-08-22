@@ -6,8 +6,11 @@ const domain = `http://${host}:${port}`;
 const config = {
   development: {
     MAIL: {
-      USER:'youremail@gmail.com',
-      PASS:'xxxx',
+      HOST: "xxxx",
+      PORT: 587,
+      USER: 'xxx',
+      EMAIL:'xxx',
+      PASS:'xxx',
       TRANSPORT:'SMTP'
     },
     APP: {
