@@ -13,7 +13,7 @@ const init = (conf) => {
     host: conf.MAIL.HOST,
     port: conf.MAIL.PORT,
     auth: { 
-      user: conf.MAIL.EMAIL, 
+      user: conf.MAIL.USER, 
       pass: conf.MAIL.PASS,
     },
     debug: true,
