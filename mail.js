@@ -39,7 +39,7 @@ const sendMail = (to, subject, body, isHtmlBody) => {
   });
 };
 const sendConfirmateMail = (to) => {
-  var subject = 'Por favor, confirma tu email. Eatnow!',
+  var subject = 'Por favor, confirma tu email. Abakus',
       token   = md5(Date() + to),
       html    = getLinkConfirmate(to, token);
   sendMail(to, subject, html, true);
