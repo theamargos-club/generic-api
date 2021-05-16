@@ -8,12 +8,14 @@ const bodyParser = require('body-parser')
 const settings = require('./config')
 const auth = require('./auth')
 const mail = require('./mail')
+const phone = require('./phone')
 const { res_error } = require('./errors')
-const { gLst, gGet, gPut, gDel, gUpd } = require('./api')
+const { gLst, gGet, gPut, gDel, gUpd, gUpdPassword, gCreateWallet } = require('./api')
 
 const app = express()
 const config = settings.init(app)
 mail.init(config)
+phone.init(config)
 const secret = "4$4bmQH23+$IFTRMv34R5seffeceE0EmC8YQ4o$"
 
 app.use(cors())
@@ -33,6 +35,8 @@ MongoClient.connect(config.APP.DB_URL, {useUnifiedTopology: true}, (
     app.post('/signup', auth.signup(db, mail))
     app.get ('/confirm/:token', auth.confirm(db))
     app.post('/login', auth.login(db, secret, jwt))
+    app.post('/updphone', auth.updatePhone(db, phone))
+    app.post('/confirmphone', auth.confirmPhone(db, phone))
 
     // generic api
     app.post('/api/:entity/lst', gLst(db))
@@ -40,6 +44,8 @@ MongoClient.connect(config.APP.DB_URL, {useUnifiedTopology: true}, (
     app.get ('/api/:entity/del', gDel(db))
     app.post('/api/:entity/put', gPut(db))
     app.post('/api/:entity/upd', gUpd(db))
+    app.post('/api/:entity/updPassword', gUpdPassword(db))
+    app.post('/api/:entity/createWallet', gCreateWallet(db))
 
     app.all('*', (req, res) => res_error(res, 'NOT_FOUND'))
 
