@@ -38,3 +38,4 @@ archive/*
 build/*
 src/*.js
 .idea/
+.env
