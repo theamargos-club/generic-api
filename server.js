@@ -29,7 +29,6 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     if (err) return console.log('Unable to connect to mongodb', err)
 
     const db = conn.db(config.APP.DB)
-
     // auth entrypoints
     app.post('/signup', auth.signup(db, mail))
     app.get('/confirm/:token', auth.confirm(db))
