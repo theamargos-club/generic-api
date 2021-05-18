@@ -44,7 +44,6 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     app.post('/api/:entity/upd', gUpd(db))
     app.post('/api/:entity/updPassword', gUpdPassword(db))
     app.post('/api/:entity/createWallet', gCreateWallet(db))
-
     app.all('*', (req, res) => resError(res, 'NOT_FOUND'))
 
     app.listen(config.APP.PORT, () => {
