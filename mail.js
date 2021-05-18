@@ -31,11 +31,8 @@ const sendMail = (to, subject, body, isHtmlBody) => {
     mailOptions.text = body
   }
   smtpTransport.sendMail(mailOptions, function (error, response) {
-    if (error) {
-      console.log(error)
-    } else {
-      console.log('Message sent: ' + response.message)
-    }
+    if (error) console.log(error)
+    else console.log('Message sent: ' + response.message)
   })
 }
 const sendConfirmateMail = (to) => {
