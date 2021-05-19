@@ -59,3 +59,4 @@ const resError = (res, type, message) => {
 }
 
 module.exports = { errors, resError }
+
