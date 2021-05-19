@@ -3,6 +3,7 @@ const md5 = require('MD5')
 
 let smtpTransport = null
 let urlConfirmMail = null
+
 const mailOptions = {
   from: '', to: '', subject: '', html: '', text: ''
 }
