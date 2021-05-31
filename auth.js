@@ -1,4 +1,5 @@
 const md5 = require('MD5')
+const Oid = require('mongodb').ObjectID
 const { resError } = require('./errors')
 const { createKeyPair, setClientFromKeys } = require('./ae')
 
@@ -69,6 +70,29 @@ exports.confirm = (db) => async (req, res) => {
     return
   }
   res.json({ res: 'OP_OK', approved: true })
+}
+
+exports.gUpdPassword = db => async (req, res) => {
+  const { password, oldPassword } = req.body
+  if (!password) {
+    return resError(res, 'BAD_REQUEST', 'No password to update')
+  }
+  if (!oldPassword) {
+    return resError(res, 'BAD_REQUEST', 'No oldPassword to verify')
+  }
+  try {
+    const doc = await db.collection('users').updateOne(
+      { _id: Oid(req.user._id), password: md5(oldPassword) },
+      {
+        $set: {
+          password: md5(password)
+        }
+      }
+    )
+    res.json(doc)
+  } catch (err) {
+    return resError(res, 'SERVER_ERROR')
+  }
 }
 
 exports.updatePhone = (db, phone) => async (req, res) => {

@@ -1,5 +1,4 @@
 const Oid = require('mongodb').ObjectID
-const md5 = require('MD5')
 const { resError } = require('./errors')
 const { getBalance, spend } = require('./ae')
 
@@ -56,27 +55,6 @@ exports.gUpd = db => async (req, res) => {
     const doc = await db
       .collection(req.params.entity)
       .updateOne({ _id: Oid(data._id) }, { $set: updData })
-    res.json(doc)
-  } catch (err) {
-    return resError(res, 'SERVER_ERROR')
-  }
-}
-
-exports.gUpdPassword = db => async (req, res) => {
-  const data = req.body
-  if (!data || !('_id' in data)) {
-    return resError(res, 'BAD_REQUEST', 'No data or _id to update password')
-  }
-  const { _id, password } = data
-  try {
-    const doc = await db.collection(req.params.entity).updateOne(
-      { _id: Oid(_id) },
-      {
-        $set: {
-          password: md5(password)
-        }
-      }
-    )
     res.json(doc)
   } catch (err) {
     return resError(res, 'SERVER_ERROR')

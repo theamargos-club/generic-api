@@ -16,7 +16,6 @@ const {
   gPut,
   gDel,
   gUpd,
-  gUpdPassword,
   gAeBalance,
   gAeSpend
 } = require('./api')
@@ -43,6 +42,7 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     app.post('/login', auth.login(db, secret, jwt))
     app.post('/updphone', auth.updatePhone(db, phone))
     app.post('/confirmphone', auth.confirmPhone(db, phone))
+    app.post('/api/updPassword', auth.gUpdPassword(db))
 
     // aeternity
     app.get('/api/balance', gAeBalance)
@@ -54,7 +54,6 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     app.get('/api/:entity/del', gDel(db))
     app.post('/api/:entity/put', gPut(db))
     app.post('/api/:entity/upd', gUpd(db))
-    app.post('/api/:entity/updPassword', gUpdPassword(db))
 
     app.all('*', (req, res) => resError(res, 'NOT_FOUND'))
 
