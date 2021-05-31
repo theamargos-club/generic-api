@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors')
 
 const { MongoClient } = require('mongodb')
-const session = require('express-session')
 const jwt = require('jsonwebtoken')
 const expressJwt = require('express-jwt')
 const bodyParser = require('body-parser')
@@ -11,7 +10,16 @@ const auth = require('./auth')
 const mail = require('./mail')
 const phone = require('./phone')
 const { resError } = require('./errors')
-const { gLst, gGet, gPut, gDel, gUpd, gUpdPassword, gCreateWallet } = require('./api')
+const {
+  gLst,
+  gGet,
+  gPut,
+  gDel,
+  gUpd,
+  gUpdPassword,
+  gAeBalance,
+  gAeSpend
+} = require('./api')
 
 const app = express()
 const config = settings.init(app)
@@ -22,7 +30,6 @@ const secret = process.env.SEED
 app.use(cors())
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 app.use(bodyParser.json({ limit: '50mb' }))
-app.use(session({ secret: secret, resave: true, saveUninitialized: true }))
 app.use('/api/', expressJwt({ secret: secret, algorithms: ['HS256'] }))
 
 MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
@@ -37,6 +44,10 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     app.post('/updphone', auth.updatePhone(db, phone))
     app.post('/confirmphone', auth.confirmPhone(db, phone))
 
+    // aeternity
+    app.get('/api/balance', gAeBalance)
+    app.post('/api/spend', gAeSpend)
+
     // generic api
     app.post('/api/:entity/lst', gLst(db))
     app.get('/api/:entity/get', gGet(db))
@@ -44,7 +55,7 @@ MongoClient.connect(config.APP.DB_URL, { useUnifiedTopology: true },
     app.post('/api/:entity/put', gPut(db))
     app.post('/api/:entity/upd', gUpd(db))
     app.post('/api/:entity/updPassword', gUpdPassword(db))
-    app.post('/api/:entity/createWallet', gCreateWallet(db))
+
     app.all('*', (req, res) => resError(res, 'NOT_FOUND'))
 
     app.listen(config.APP.PORT, () => {

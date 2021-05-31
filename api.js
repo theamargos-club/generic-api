@@ -1,7 +1,7 @@
 const Oid = require('mongodb').ObjectID
 const md5 = require('MD5')
 const { resError } = require('./errors')
-const ethers = require('ethers')
+const { getBalance, spend } = require('./ae')
 
 exports.gLst = db => (req, res) => {
   const filters = req.body.filters || {}
@@ -14,7 +14,6 @@ exports.gLst = db => (req, res) => {
 
 exports.gGet = db => (req, res) => {
   const { _id } = req.query
-
   db.collection(req.params.entity)
     .findOne({ _id: Oid(_id) },
       (err, usr) => {
@@ -31,7 +30,6 @@ exports.gDel = db => (req, res) => {
   if (!_id) {
     return resError(res, 'BAD_REQUEST', 'No _id to delete')
   }
-
   db.collection(req.params.entity).remove({ _id: Oid(_id) }, (err, doc) =>
     err ? resError(res, 'SERVER_ERROR') : res.json(doc)
   )
@@ -54,7 +52,6 @@ exports.gUpd = db => async (req, res) => {
   }
   const updData = { ...data }
   delete updData._id
-
   try {
     const doc = await db
       .collection(req.params.entity)
@@ -70,9 +67,7 @@ exports.gUpdPassword = db => async (req, res) => {
   if (!data || !('_id' in data)) {
     return resError(res, 'BAD_REQUEST', 'No data or _id to update password')
   }
-
   const { _id, password } = data
-
   try {
     const doc = await db.collection(req.params.entity).updateOne(
       { _id: Oid(_id) },
@@ -88,27 +83,18 @@ exports.gUpdPassword = db => async (req, res) => {
   }
 }
 
-exports.gCreateWallet = db => async (req, res) => {
-  const data = req.body
-  if (!data || !('_id' in data)) {
-    return resError(res, 'BAD_REQUEST', 'No data or _id to create wallet')
+exports.gAeBalance = async (req, res) => {
+  const { keypair } = req.user.ae
+  const balance = await getBalance(keypair)
+  res.json({ balance })
+}
+
+exports.gAeSpend = async (req, res) => {
+  const { keypair } = req.user.ae
+  const { amount, to } = req.body
+  if (!amount || !to) {
+    return resError(res, 'BAD_REQUEST', 'No "amount" or "to" provided')
   }
-
-  const { _id } = data
-
-  const wallet = ethers.Wallet.createRandom()
-
-  try {
-    const doc = await db.collection(req.params.entity).updateOne(
-      { _id: Oid(_id) },
-      {
-        $set: {
-          wallet: wallet
-        }
-      }
-    )
-    res.json(doc)
-  } catch (err) {
-    return resError(res, 'SERVER_ERROR')
-  }
+  const tx = await spend(keypair, amount, to)
+  res.json({ tx })
 }

@@ -1,5 +1,6 @@
 const md5 = require('MD5')
 const { resError } = require('./errors')
+const { createKeyPair, setClientFromKeys } = require('./ae')
 
 exports.logged = (req, res, next) => req.isAuthenticated() ? next() : resError(res, 'INVALID_CREDENTIALS')
 
@@ -15,6 +16,7 @@ exports.login = (db, secret, jwt) => (req, res) => {
         return resError(res, 'INVALID_CREDENTIALS')
       }
       usr.token = jwt.sign(usr, secret, { expiresIn: 60 * 5 })
+      setClientFromKeys(usr.ae.keypair)
       delete usr.password
       delete usr.username
       return res.json(usr)
@@ -32,12 +34,14 @@ exports.signup = (db, mail) => async (req, res) => {
   if (usr) {
     return resError(res, 'UNPROCESSABLE_ENTITY')
   }
+  const keypair = createKeyPair()
   const token = mail.sendConfirmateMail(username)
   const data = {
     approved: false,
     password: md5(password),
     token,
-    username
+    username,
+    ae: { keypair }
   }
   await db.collection('users').insertOne(data)
   res.json({ res: 'OP_OK', data })
